@@ -18,7 +18,9 @@
     --gradient-shadow-three: linear-gradient(300deg, #ffee00,#177516,#00ffb7,#0dfbfb,#0db4fb, #06027d,#c700fe,#ff04c9, #fb0d0d );
     /*--gradient-shadow-four: linear-gradient(300deg,#ffffff,#ffffff,#ffffff,#000000,#000000,#000000 );*/
     --gradient-shadow-four: linear-gradient(300deg,#000000,#000000,#000000 );
-   --gradient-shadow-four: linear-gradient(300deg, rgb(194, 252, 255), rgb(255, 150, 178));
+    --gradient-shadow-five: linear-gradient(300deg, #0062ff, #DB4437, #F4B400, #0F9D58,#0062ff, #DB4437, #F4B400, #0F9D58,#0062ff, #DB4437, #F4B400, #0F9D58);
+
+  /* --gradient-shadow-five: linear-gradient(300deg, rgb(194, 252, 255), rgb(255, 150, 178));*/
     /*  --gradient-shadow-three: linear-gradient(300deg, rgb(104, 103, 103), rgb(255, 255, 255));*/
     /* --gradient-shadow-three: linear-gradient(300deg,rgb(32, 0, 161), #ff0000, #0de747, rgb(6, 0, 2)); */
 }
@@ -67,22 +69,35 @@ body {
 
 .bgcolors {
     overflow: hidden;
-    background: var(--gradient-shadow-four);
+    background: var(--gradient-shadow-five);
     background-size: 400% 400%;
-    animation: slideBackground 60s linear infinite;
+    animation: slideBackground 10s linear infinite;
 }
 
-.bgcolor {
-    overflow: hidden;
-    background: var(--gradient-shadow-four);
-    background-size: 400% 400%;
-    animation: slideBackground 15s linear infinite;
+.googlecolor {
+    background-image: var(--gradient-shadow-five);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    background-size: 400% 100%;
+    animation: slideBackground 60s linear infinite;    
 }
 
 .fontstylesmall {
     font-family: Montserrat, Trebuchet MS, sans-serif;
     font-size: 17px;
 
+}
+
+.signupfont{
+    font-family: Montserrat,
+    Trebuchet MS, Lucida Grande,
+    Lucida Sans Unicode, Lucida Sans,
+    Tahoma, sans-serif;
+}
+
+.textupper{
+    padding-top: 2%;
 }
 
 .fontstyle {
