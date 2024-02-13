@@ -1,0 +1,118 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+
+:root {
+    /* --gradient-shadow-two: linear-gradient(300deg, #68d391, #38b2ac, #3498db); */
+    --gradient-shadow-two: linear-gradient(300deg, #000000, #a0a0a0, #000000, #acacac);
+   /* --gradient-shadow-three: linear-gradient(300deg, rgb(166, 255, 249), #797474, #eeeaea, rgb(255, 166, 190), #f7fb72, #b0ff8e, #06027d, #ff8f16, #fb0d0d, #177516);*/
+    --gradient-shadow-three: linear-gradient(300deg, #ffee00,#177516,#00ffb7,#0dfbfb,#0db4fb, #06027d,#c700fe,#ff04c9, #fb0d0d );
+    /*--gradient-shadow-four: linear-gradient(300deg,#ffffff,#ffffff,#ffffff,#000000,#000000,#000000 );*/
+    --gradient-shadow-four: linear-gradient(300deg,#000000,#000000,#000000 );
+   --gradient-shadow-four: linear-gradient(300deg, rgb(194, 252, 255), rgb(255, 150, 178));
+    /*  --gradient-shadow-three: linear-gradient(300deg, rgb(104, 103, 103), rgb(255, 255, 255));*/
+    /* --gradient-shadow-three: linear-gradient(300deg,rgb(32, 0, 161), #ff0000, #0de747, rgb(6, 0, 2)); */
+}
+
+@keyframes slideBackground {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+@keyframes slideBackground {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.text {
+    background-image: var(--gradient-shadow-three);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    background-size: 400% 100%;
+    animation: slideBackground 15s linear infinite;
+}
+
+.bgcolors {
+    overflow: hidden;
+    background: var(--gradient-shadow-four);
+    background-size: 400% 400%;
+    animation: slideBackground 60s linear infinite;
+}
+
+.bgcolor {
+    overflow: hidden;
+    background: var(--gradient-shadow-four);
+    background-size: 400% 400%;
+    animation: slideBackground 15s linear infinite;
+}
+
+.fontstylesmall {
+    font-family: Montserrat, Trebuchet MS, sans-serif;
+    font-size: 17px;
+
+}
+
+.fontstyle {
+    color: #1f0b0b;
+    font-family: Montserrat,
+        Trebuchet MS, Lucida Grande,
+        Lucida Sans Unicode, Lucida Sans,
+        Tahoma, sans-serif;
+    font-size: 46px;
+    line-height: 120%;
+    text-align: left;
+    font-weight: 1000;
+
+}
+
+.buttonstyle {
+    display: inline-block;
+    background-color: transparent;
+    text-decoration: none;
+    border-radius: 4px;
+    border: 1px solid rgb(224, 224, 224);
+    box-shadow: none;
+    padding: 10px 20px;
+    font-family: Montserrat, Trebuchet MS, sans-serif;
+    font-size: 17px;
+    font-weight: bolder;
+    height: 45px;
+    margin-left: 200px;
+}
+
+.buttonstyle:hover {
+    box-shadow: 0 0 10px rgb(255, 255, 255);
+}
