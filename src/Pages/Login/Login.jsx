@@ -1,10 +1,12 @@
+import React from 'react';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Card, Typography } from '@material-tailwind/react';
 import { useGoogleLogin } from '@react-oauth/google';
-import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
+    const navigate =useNavigate()
 
     let googleData = ''
     const LoginWithGoogleAuth = useGoogleLogin({
@@ -136,7 +138,7 @@ function Login() {
                         SIGN IN WITH GOOGLE
                     </span>
                 </Button>
-                <p className='signupfont text-white opacity-30 hover:opacity-100  hover:cursor-pointer'>New User? Get Started Here</p>
+                <p onClick={() => navigate('/signup')} className='signupfont text-white opacity-30 hover:opacity-100  hover:cursor-pointer'>New User? Get Started Here</p>
 
 
             </Card>
