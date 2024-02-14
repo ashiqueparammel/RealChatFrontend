@@ -4,15 +4,19 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Card, Typography } from '@material-tailwind/react';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
+import { google_Access_Token } from '../../Constants/Constants';
+import { loginGoogleOAuth } from '../../Services/UserApi';
+import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
 function Login() {
-    const navigate =useNavigate()
+    const navigate = useNavigate()
 
     let googleData = ''
     const LoginWithGoogleAuth = useGoogleLogin({
         onSuccess: (codeResponse) => {
             googleData = codeResponse
-            console.log(googleData.access_token, 'googleDataTOken');
             GoogleAuth();
         },
         onError: (error) => {
@@ -22,97 +26,49 @@ function Login() {
     });
 
     const GoogleAuth = async () => {
-        // try {
-        //     if (!googleData) return;
-        //     const tokenData = await axios.get(
-        //         `${Google_Access_Token}access_token=${googleData.access_token}`,
-        //         {
-        //             headers: {
-        //                 Authorization: `Bearer ${googleData.access_token}`,
-        //                 Accept: "application/json",
-        //             },
-        //         }
-        //     );
-        //     const backend_access = googleData.access_token
-        //     googleData = tokenData.data;
-        //     const googleUser = {
-        //         email: googleData.email,
-        //         access_token: backend_access
-        //     }
-        //     try {
-        //         setLoadingManage(true)
-        //         const googleResponse = await axios.post(User_Google_Login, googleUser);
-        //         const response = googleResponse.data
-        //         if (response.status === 406) {
-        //             setTimeout(() => {
-        //                 toast.error(response.message)
-        //             }, 500);
-        //             navigate('/login')
-        //         }
-        //         if (response.status === 403) {
-        //             setTimeout(() => {
-        //                 toast.error(response.message)
-        //             }, 500);
-        //             navigate('/login')
-        //         }
-        //         if (response.status === 202) {
-        //             setTimeout(() => {
-        //                 toast.error(response.message)
-        //             }, 500);
-        //             navigate('/login')
-        //         }
-        //         // if already signup with form work this 
+        try {
+            if (!googleData) return;
+            const tokenData = await axios.get(
+                google_Access_Token + googleData.access_token,
+                {
+                    headers: {
+                        Authorization: `Bearer ${googleData.access_token}`,
+                        Accept: "application/json",
+                    },
+                }
+            );
+            const access_token = googleData.access_token
+            googleData = tokenData.data;
+            const googleUser = {
+                email: googleData.email,
+                access_token: access_token
+            }
+            try {
+                const data = await loginGoogleOAuth(googleUser);
+                if (data.status === 200) {
+                    const userToken = data.token
+                    try {
+                        const token = jwtDecode(userToken.access)
+                        localStorage.setItem('token', JSON.stringify(userToken));
+                        if (token.is_active === true && token.is_superuser === false) {
+                            toast.success(data.message);
+                            setTimeout(() => {
+                                navigate('/');
+                            }, 1000);
 
-        //         if (response.status === 201) {
-        //             setTimeout(() => {
-        //                 toast.success(response.message)
-        //             }, 500);
-        //             const data = (response.token)
-        //             localStorage.setItem('token', JSON.stringify(data));
-
-        //             try {
-        //                 const token = jwtDecode(data.access)
-        //                 const setUser = {
-        //                     "id": token.user_id,
-        //                     "email": token.email,
-        //                     "is_superuser": token.is_superuser,
-        //                     "is_company": token.is_company,
-        //                     "is_google": token.is_google,
-        //                     "is_active": token.is_active,
-        //                 }
-        //                 dispatch(setUserDetails(setUser));
-        //                 setLoadingManage(false)
-        //                 if (token.is_superuser && token.is_active) {
-        //                     navigate('/admin/');
-        //                 }
-        //                 else if (token.is_company && token.is_active) {
-        //                     navigate('/company/');
-        //                 }
-        //                 else if (token.is_active) {
-        //                     navigate('/');
-        //                 }
-        //                 else {
-        //                     toast.error('Invalid Credentials!')
-        //                     navigate('/login');
-        //                 }
-
-        //             } catch (error) {
-        //                 setLoadingManage(false)
-        //                 console.error('Error decoding JWT:', error);
-        //             }
-
-        //         }
-        //     } catch (error) {
-        //         setLoadingManage(false)
-        //         console.error('Error during signup:', error);
-        //         toast.error(error.message);
-        //     }
-        // } catch (error) {
-        //     setLoadingManage(false)
-        //     console.log(error.response);
-        //     toast.error(error.message);
-        // }
-        console.log('ok ');
+                        }
+                    } catch (error) {
+                        console.error('Error decoding JWT:', error);
+                        toast.error(error.message);
+                    }
+                }
+            } catch (error) {
+                console.error('Error login:', error);
+                toast.error(error.message);
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
     };
 
     return (
@@ -142,7 +98,7 @@ function Login() {
 
 
             </Card>
-
+            <Toaster />
         </div>
     )
 }

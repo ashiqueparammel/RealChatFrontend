@@ -4,6 +4,7 @@ import Signup from './Pages/Signup/Signup'
 import { ToastContainer } from 'react-toastify';
 import Protected from './Routes/Protected/Protected';
 import UserRoutes from './Routes/UserRoutes/UserRoutes';
+import UnProtected from './Routes/Protected/UnProtected';
 function App() {
   return (
 
@@ -11,8 +12,10 @@ function App() {
       <Router>
 
         <Routes>
-          <Route element={<Signup />} path='/signup' />
-          <Route element={<Login />} path='/login' />
+          <Route element={<UnProtected/>}>
+            <Route element={<Signup />} path='/signup' />
+            <Route element={<Login />} path='/login' />
+          </Route>
           <Route element={<Protected />}>
           </Route>
           <Route element={<UserRoutes />} path='/*' />
