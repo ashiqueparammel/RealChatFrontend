@@ -56,8 +56,43 @@ body {
     100% {
         background-position: 0% 50%;
     }
-}
+} 
 
+/* @keyframes slideBorder  {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}  */
+
+
+/* @keyframes rotate {
+    0% { --angle: 0deg; --glowColor: var(--gradient-shadow-three);}
+    100% { --angle: 360deg; --glowColor: var(--gradient-shadow-three);}
+  } */
+
+
+/* .button {
+    background: transparent; 
+    border: 2px solid; 
+    border-image: var(--gradient-shadow-three); 
+    border-image-slice: 1; 
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: rotate 15s linear infinite;
+} */
+
+.hidescroll::-webkit-scrollbar {
+    display: none;
+  
+  }
 .text {
     background-image: var(--gradient-shadow-three);
     -webkit-background-clip: text;
@@ -69,9 +104,9 @@ body {
 
 .bgcolors {
     overflow: hidden;
-    background: var(--gradient-shadow-five);
+    background: var(--gradient-shadow-three);
     background-size: 400% 400%;
-    animation: slideBackground 10s linear infinite;
+    animation: slideBackground 60s linear infinite;
 }
 
 .googlecolor {
@@ -131,3 +166,12 @@ body {
 .buttonstyle:hover {
     box-shadow: 0 0 10px rgb(255, 255, 255);
 }
+
+
+
+
+
+
+
+/* starting  */
+
