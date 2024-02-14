@@ -27,7 +27,8 @@ const loginGoogleOAuth = async (user) => {
 const loginUser = async (user) => {
     try {
         const response = await axios.post(baseURL + LoginURL, user);
-        return response.data
+        console.log(response);
+        return response
     } catch (error) {
         return error;
     }

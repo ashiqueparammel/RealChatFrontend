@@ -54,8 +54,8 @@ function Signup() {
                     }
                     const userToken = await loginUser(loginData);
                     try {
-                        const token = jwtDecode(userToken.access)
-                        localStorage.setItem('token', JSON.stringify(userToken));
+                        const token = jwtDecode(userToken.data.access)
+                        localStorage.setItem('token', JSON.stringify(userToken.data));
                         if (token.is_active === true && token.is_superuser === false) {
                             navigate('/');
                         }
