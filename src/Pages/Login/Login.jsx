@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Card, Typography } from '@material-tailwind/react';
 import { useGoogleLogin } from '@react-oauth/google';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import { google_Access_Token } from '../../Constants/Constants';
 import { loginGoogleOAuth, loginUser } from '../../Services/UserApi';
@@ -12,10 +12,21 @@ import { jwtDecode } from 'jwt-decode';
 import Validforms from '../../Helpers/Validforms';
 
 function Login() {
+    const location = useLocation();
+    let message = new URLSearchParams(location.search)?.get('message') ?? null;
+
+  useEffect(() => {
+    if (message) {
+        toast.success(message)
+        message=null
+    }
+  }, [message])
+  
+
     const navigate = useNavigate()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-
+   
     let googleData = ''
     const LoginWithGoogleAuth = useGoogleLogin({
         onSuccess: (codeResponse) => {
@@ -64,7 +75,7 @@ function Login() {
                         toast.error(error.message);
                     }
                 }
-                else{
+                else {
                     toast.error(data.message);
                 }
             } catch (error) {

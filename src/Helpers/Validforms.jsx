@@ -4,6 +4,13 @@ import toast, { Toaster } from 'react-hot-toast';
 function Validforms(data) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isValidEmail = emailRegex.test(data.email)
+    
+    if (data.signup) {
+        if (data.username.trim() === "") {
+            toast.error(' username field cannot empty!');
+            return false;
+        }
+    }
 
     if (data.email.trim() === "") {
         toast.error(' Email field cannot empty!');
@@ -18,7 +25,7 @@ function Validforms(data) {
         toast.error('Password field cannot empty!');
         return false;
     }
-    else if (data.password.length<8) {
+    else if (data.password.length < 8) {
         toast.error('password should be minimum 8 digits !');
         return false;
 

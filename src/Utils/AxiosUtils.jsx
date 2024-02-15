@@ -9,13 +9,17 @@ const CreateAxios = () =>{
     return upadtedUrl
 }
 
-const attachToken = (req) =>{
-    let authToken = localStorage.getItem('token')
-    const accesstoken = JSON.parse(authToken);
-    if (accesstoken){
-        req.headers.Authorization = `Bearer ${accesstoken.access}`;
+const attachToken = (req) => {
+    const authToken = localStorage.getItem('token');
+    const accessToken = JSON.parse(authToken);
+    
+    if (accessToken) {
+        req.headers = {
+            ...req.headers,
+            Authorization: `Bearer ${accessToken.access}`
+        };
     }
-    return req
+    return req;
 }
 
 const UserAxiosInstant = CreateAxios()

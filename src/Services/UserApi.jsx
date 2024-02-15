@@ -1,13 +1,26 @@
 import axios from "axios";
 import { UserAxiosInstant } from "../Utils/AxiosUtils";
-import { LoginURL, baseURL, googleLoginURL, googleSignupURL } from "../Constants/Constants";
+import { LoginURL, baseURL, chatList, chatSearch, googleLoginURL, googleSignupURL, signupURL } from "../Constants/Constants";
 
-const Home = async (value) => {
+const listUserHome = async (value) => {
     try {
         return await UserAxiosInstant.get(
-            `accounts/updateuser/`, value, {
+            `${chatList}${value}/`, {
             withCredentials: true
-        }
+        }  
+        );
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+const searchUsers = async (value) => {
+    try {
+        return await UserAxiosInstant.get(
+            chatSearch+value, {
+            withCredentials: true
+        }  
         );
     } catch (error) {
         console.log(error);
@@ -35,6 +48,17 @@ const loginUser = async (user) => {
 
 }
 
+const signupUser = async (user) => {
+    try {
+        const response = await axios.post(baseURL + signupURL, user);
+        console.log(response);
+        return response.data
+    } catch (error) {
+        return error;
+    }
+
+}
+
 const signupGoogleOAuth = async (user) => {
     try {
         const response = await axios.post(baseURL + googleSignupURL, user);
@@ -46,4 +70,8 @@ const signupGoogleOAuth = async (user) => {
 
 
 
-export { loginGoogleOAuth, signupGoogleOAuth, loginUser }
+export { loginGoogleOAuth, signupGoogleOAuth, loginUser,signupUser,listUserHome,searchUsers}
+
+
+
+
