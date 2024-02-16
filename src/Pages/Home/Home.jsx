@@ -5,9 +5,10 @@ import React, { useEffect, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { listUserHome, searchUsers } from '../../Services/UserApi';
+import { baseURL } from '../../Constants/Constants';
 
 function Home() {
-
+  const navigate = useNavigate()
   const token = localStorage.getItem('token')
   const decoded = jwtDecode(token);
   const user = decoded
@@ -22,7 +23,6 @@ function Home() {
     if (searchValues !== '') {
       const throttledSearchHandle = async () => {
         const searchData = await searchUsers(searchValues);
-        console.log(searchData.data, '======================>>');
         setUsersList(searchData.data)
       };
 
@@ -32,7 +32,6 @@ function Home() {
     else {
       const listChatUsers = async () => {
         const data = await listUserHome(user.user_id)
-        console.log(data.data, '=============>>>>>>>>>');
         setUsersList(data.data.connections)
       }
       listChatUsers();
@@ -42,6 +41,9 @@ function Home() {
 
   }, [searchValues]);
 
+  const handleChat = (event) => {
+    navigate('/chat', { state: event })
+  }
 
 
   return (
@@ -55,22 +57,23 @@ function Home() {
               <div className='overflow-y-auto max-h-screen hidescroll'>
 
                 <ul className=''>
-                  {usersList.map((chatuser) => (<li className="flex justify-between items-center bg-white mt-2 p-2 hover:shadow-lg rounded-md cursor-pointer transition">
-                    <div className="flex ml-2">
-                      {(chatuser.profile_image ?
-                        <img src={chatuser.profile_image} width="40" height="40" className="rounded-full" /> :
-                        <div width="40" height="40" className="bg-[#000000] rounded-full pl-4 pr-4 pt-1 pb-1 flex text-white text-lg uppercase font-prompt text-center items-center"><h1>{chatuser.username[0]}</h1></div>)}
-                      <div className="flex flex-col ml-2"> <span className="font-medium font-prompt uppercase text-black">{chatuser.username}</span> <span className="text-sm text-gray-400 truncate w-32">Hey, Joel, I here to help you out please tell me</span> </div>
-                    </div>
-                    <div className="flex flex-col items-center"> <span className="text-gray-300">11:26</span> <i className="fa fa-star text-green-400"></i> </div>
-                  </li>))}
-                  {/* <li className="flex justify-between items-center bg-white mt-2 p-2 hover:shadow-lg rounded cursor-pointer transition">
-                    <div className="flex ml-2"> <img src="https://i.imgur.com/eMaYwXn.jpg" width="40" height="40" className="rounded-full" />
-                      <div className="flex flex-col ml-2"> <span className="font-medium text-black">Komeial Bolger</span> <span className="text-sm text-gray-400 truncate w-32">I will send you all documents as soon as possible</span> </div>
-                    </div>
-                    <div className="flex flex-col items-center"> <span className="text-gray-300">12:26</span> <i className="fa fa-star text-green-400"></i> </div>
-                  </li> */}
-
+                  {usersList.map((chatuser, index) => (chatuser.id !== user.user_id ?
+                    <li key={index} onClick={() => handleChat(chatuser)} className="flex justify-between items-center bg-white mt-2 p-2 hover:shadow-lg rounded-md cursor-pointer transition">
+                      <div className="grid grid-cols-5 gap-4">
+                        <div className="col-span-1">
+                          {chatuser.profile_image ?
+                            <img src={baseURL+chatuser.profile_image} alt="Profile" className="rounded-full w-10 h-10" /> :
+                            <div className="bg-[#000000] rounded-full w-10 h-10 flex items-center justify-center text-white uppercase font-bold">
+                              {chatuser.username[0]}
+                            </div>
+                          }
+                        </div>
+                        <div className="col-span-4 flex flex-col justify-center">
+                          <span className="font-medium">{chatuser.username}</span>
+                          <span className="text-sm text-gray-400 truncate">{chatuser.message}</span>
+                        </div>
+                      </div></li> : ''
+                  ))}
                 </ul>
               </div>
 
