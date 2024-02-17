@@ -141,9 +141,16 @@ h1:hover .hidden {
     
   }
 
-.rotate-45 {
+  .rotate-45 {
     transform: rotate(45deg);
-  }  
+    transition: transform 0.3s ease;
+    
+  }
+  .rotate-0 {
+    transform: rotate(0deg);
+    transition: transform 0.3s ease;
+  }
+  
   
 .signupfont{
     font-family: Montserrat,

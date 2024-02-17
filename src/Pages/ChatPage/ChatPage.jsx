@@ -27,42 +27,16 @@ function ChatPage() {
     const [recipientDetails, setrecipientDetails] = useState(recipient || [])
 
 
-    useEffect(() => {
-        let timeoutId;
-
-        if (searchValues !== '') {
-            const throttledSearchHandle = async () => {
-                const searchData = await searchUsers(searchValues);
-                setUsersList(searchData.data)
-            };
-
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(throttledSearchHandle, 500);
-        }
-        else {
-            const listChatUsers = async () => {
-                const data = await listUserHome(user.user_id)
-                setUsersList(data.data.connections)
-            }
-            listChatUsers();
-        }
-        return () => clearTimeout(timeoutId);
-
-
-    }, [searchValues, recipientDetails]);
-
-
-    const handleChat = async (event) => {
-        setrecipientDetails(event)
-        const prevChat = await previousChatList(user.user_id, event.id)
+    const handleChat = async () => {
+        const prevChat = await previousChatList(user.user_id, recipientDetails.id)
         setMessages(prevChat.data);
 
         const client = new W3CWebSocket(
-            `${webSocket}${user.user_id}/?${event.id}`
+            `${webSocket}${user.user_id}/?${recipientDetails.id}`
         );
         setClientState(client);
         client.onopen = () => {
-            console.log("WebSocket Client Connected", client);
+            console.log("WebSocket Client Connected");
         };
 
         client.onmessage = (message) => {
@@ -85,7 +59,6 @@ function ChatPage() {
     }
 
 
-
     const sendMessage = () => {
         if (messageText.trim() === '') {
             return;
@@ -104,9 +77,43 @@ function ChatPage() {
         setOpen(false);
     };
 
-  const  handleAddDocument = () => {
+    const handleAddDocument = () => {
         setOpens(!isOpens)
     }
+
+    const startChat = (event) => {
+        setrecipientDetails(event)
+
+    }
+
+    useEffect(() => {
+        let timeoutId;
+
+        if (searchValues !== '') {
+            const throttledSearchHandle = async () => {
+                const searchData = await searchUsers(searchValues);
+                setUsersList(searchData.data)
+            };
+
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(throttledSearchHandle, 500);
+        }
+        else {
+            const listChatUsers = async () => {
+                const data = await listUserHome(user.user_id)
+                setUsersList(data.data.connections)
+            }
+            listChatUsers();
+        }
+        if (senderdetails.user_id != null && recipientDetails.id != null) {
+            handleChat();
+        }
+        return () => clearTimeout(timeoutId);
+
+    }, [searchValues, recipientDetails]);
+
+
+
 
     return (
         <div className='2xl:grid 2xl:grid-cols-4 xl:grid xl:grid-cols-4 '>
@@ -122,7 +129,7 @@ function ChatPage() {
 
                                     <ul className=''>
                                         {usersList.map((chatuser, index) => (chatuser.id !== user.user_id ?
-                                            <li key={index} onClick={() => handleChat(chatuser)} className="flex justify-between items-center bg-white mt-2 p-2 hover:shadow-lg rounded-md cursor-pointer transition">
+                                            <li key={index} onClick={() => startChat(chatuser)} className="flex justify-between items-center bg-white mt-2 p-2 hover:shadow-lg rounded-md cursor-pointer transition">
                                                 <div className="grid grid-cols-5 gap-4">
                                                     <div className="col-span-1">
                                                         {chatuser.profile_image ?
@@ -221,24 +228,106 @@ function ChatPage() {
                                     )}
                                 </div>
                             ))}
-
-
                         </div>
                     </div>
-                    <div className='flex justify-items-center ml-5'>
-                        <FontAwesomeIcon onClick={handleAddDocument} icon={faPlus} className={`plus-icon ${isOpens ? 'rotate-45' : ''}`} />
-
-                        <input type="text" value={messageText} onChange={(e) => setMessageText(e.target.value)} className='w-[80%] h-12  rounded-md  border-[1px] border-black font-prompt' placeholder='Type a message' style={{ paddingLeft: '20px' }} />
-                        <Button onClick={sendMessage} className='w-16 h-12 ml-4 bg-[#051339] '></Button>
+                    <div className='flex justify-items-center bg-black border-l-[1px] shadow-lg shadow-[#6b6b6b] p-2 '>
+                        <div>
+                            <FontAwesomeIcon onClick={handleAddDocument} icon={faPlus} color='white' className={`plus-icon ${isOpens ? 'rotate-45 pt-3 pr-3' : 'rotate-0 pt-3 pr-3'} w-6 h-6  hover:cursor-pointer ml-4`} />
+                        </div>
+                        <input type="text" value={messageText} onChange={(e) => setMessageText(e.target.value)} className='w-[90%] h-12  rounded-md  outline-none border-[1px] border-black font-prompt' placeholder='Type a message' style={{ paddingLeft: '20px' }} />
+                        <svg xmlns="http://www.w3.org/2000/svg" onClick={sendMessage} viewBox="0 0 24 24" fill="white" className="bg rounded-md hover:bg-white hover:bg-opacity-20  p-[3px]  w-9 mt-[5px]  ml-3 h-9">
+                            <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
+                        </svg>
                     </div>
                 </div>
-
             </div>
-            <div className='w-screen 2xl:hidden '>
-                <div className='bg-black h-20 border-l-[1px]'>
 
+            <div className='w-screen 2xl:hidden'>
+                <div className='h-screen grid grid-rows-[auto,1fr]'>
+                    <div className='bg-black h-20 border-l-[1px] shadow-lg shadow-[#6b6b6b]'>
+                        <div className='grid grid-cols-4 gap-4 pt-3 pl-4'>
+                            {recipientDetails.profile_image ? (
+                                <img src={baseURL + recipientDetails.profile_image} alt="Profile" className="rounded-full w-14 h-14 col-span-1" />
+                            ) : (
+                                <div className="bg-[#ffffff] rounded-full w-14 h-14 flex items-center justify-center text-xl col-span-1 text-black uppercase font-bold">
+                                    {recipientDetails.username[0]}
+                                </div>
+                            )}
+                            <div className='flex flex-col justify-start col-span-3 '>
+                                <h1 className="text-white text-sm sm:text-md md:text-lg lg:text-xl uppercase pt-1   ">{recipientDetails.username}</h1>
+                                <h1 className="text-white text-sm sm:text-md md:text-lg lg:text-lg ">{recipientDetails.email}</h1>
+                            </div>
+                            <div className="text-center pt-4 col-span-4">
+                                <Menu>
+                                    <MenuHandler>
+                                        <span className="absolute right-2 top-2 text-white text-xl"><Hamburger toggled={isOpen} toggle={setOpen} /></span>
+                                    </MenuHandler>
+                                    <MenuList className="max-h-72 text-black font-prompt text-md">
+                                        <MenuItem onClick={closeMenu}>Block</MenuItem>
+                                        <MenuItem onClick={closeMenu}>ClearChat</MenuItem>
+                                        <MenuItem onClick={closeMenu}>Report</MenuItem>
+                                    </MenuList>
+                                </Menu>
+                            </div>
+                        </div>
+                    </div>
+                    <div className='max-h-screen overflow-y-auto hidescroll '>
+                        <div className="grid grid-cols-1">
+                            {messages.map((chatMessage, index) => (
+                                <div key={index}>
+                                    {chatMessage.sender_email === senderdetails.email ? (
+                                        <div className='flex justify-end'>
+                                            <div className='flex justify-end'>
+                                                <div className='flex flex-col items-end'>
+                                                    <Menu>
+                                                        <MenuHandler>
+                                                            <h1 className='bg-white shadow-md shadow-[#989898] font-prompt p-2 text-black text-center tracking-wider w-fit rounded-tl-lg rounded-tr-lg rounded-bl-lg mt-2 mr-3 hover:cursor-pointer nonedit'>
+                                                                {chatMessage.message}
+                                                                <span><FontAwesomeIcon className='hidden ml-1' color='black' icon={faEllipsisVertical} /></span>
+                                                            </h1>
+                                                        </MenuHandler>
+                                                        <MenuList className="max-h-72 text-black font-prompt text-sm  ">
+                                                            <MenuItem>Delete for everyone</MenuItem>
+                                                            <MenuItem>Delete for me</MenuItem>
+                                                        </MenuList>
+                                                    </Menu>
+                                                    <h1 className='mt-1 mr-4 text-[#7b7b7b] text-[12px]'>{timeAgo(chatMessage.timestamp) == "NaN years ago" ? "just now" : timeAgo(chatMessage.timestamp)}</h1>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className='flex justify-start'>
+                                            <div>
+                                                <Menu className=''>
+                                                    <MenuHandler>
+                                                        <h1 className='bg-[#000000] shadow-md shadow-[#989898] font-prompt p-2 text-white text-center tracking-wider rounded-tl-lg rounded-tr-lg rounded-br-lg w-fit mt-2 ml-3'>{chatMessage.message}
+                                                            <span><FontAwesomeIcon className='hidden ml-2' color='white' icon={faEllipsisVertical} /></span></h1>
+                                                    </MenuHandler>
+                                                    <MenuList className="max-h-72 text-black font-prompt text-sm">
+                                                        <MenuItem>Delete for everyone</MenuItem>
+                                                        <MenuItem>Delete for me</MenuItem>
+                                                    </MenuList>
+                                                </Menu>
+                                                <h1 className='ml-4 mt-1 text-[#7b7b7b] text-[12px]'>{timeAgo(chatMessage.timestamp) == "NaN years ago" ? "just now" : timeAgo(chatMessage.timestamp)}</h1>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className='flex justify-items-center bg-black border-l-[1px] shadow-lg shadow-[#6b6b6b] p-2'>
+                        <div>
+                            <FontAwesomeIcon onClick={handleAddDocument} icon={faPlus} color='white' className={`plus-icon ${isOpens ? 'rotate-45 pt-3 pr-3' : 'rotate-0 pt-3 pr-3'} w-6 h-6 hover:cursor-pointer ml-4`} />
+                        </div>
+                        <input type="text" value={messageText} onChange={(e) => setMessageText(e.target.value)} className='w-[90%] h-12 rounded-md outline-none border-[1px] border-black font-prompt' placeholder='Type a message' style={{ paddingLeft: '20px' }} />
+                        <svg xmlns="http://www.w3.org/2000/svg" onClick={sendMessage} viewBox="0 0 24 24" fill="white" className="bg rounded-md hover:bg-white hover:bg-opacity-20 p-[3px] w-9 mt-[5px] ml-3 h-9">
+                            <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
+                        </svg>
+                    </div>
                 </div>
             </div>
+            {/* this is end */}
 
             <Toaster />
         </div>

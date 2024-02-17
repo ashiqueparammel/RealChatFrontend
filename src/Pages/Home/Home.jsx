@@ -45,8 +45,6 @@ function Home() {
     navigate('/chat', { state: event })
   }
 
-  console.log(usersList);
-
   return (
     <div>
       <div className="py-10 h-screen bg-[#000000] px-2 ">
