@@ -24,7 +24,6 @@ div{
     /*--gradient-shadow-four: linear-gradient(300deg,#ffffff,#ffffff,#ffffff,#000000,#000000,#000000 );*/
     --gradient-shadow-four: linear-gradient(300deg,#000000,#000000,#000000 );
     --gradient-shadow-five: linear-gradient(300deg, #0062ff, #DB4437, #F4B400, #0F9D58,#0062ff, #DB4437, #F4B400, #0F9D58,#0062ff, #DB4437, #F4B400, #0F9D58);
-
   /* --gradient-shadow-five: linear-gradient(300deg, rgb(194, 252, 255), rgb(255, 150, 178));*/
     /*  --gradient-shadow-three: linear-gradient(300deg, rgb(104, 103, 103), rgb(255, 255, 255));*/
     /* --gradient-shadow-three: linear-gradient(300deg,rgb(32, 0, 161), #ff0000, #0de747, rgb(6, 0, 2)); */
@@ -62,7 +61,6 @@ body {
         background-position: 0% 50%;
     }
 } 
-
 
 /* @keyframes rotate {
     0% { --angle: 0deg; --glowColor: var(--gradient-shadow-three);}
@@ -183,9 +181,4 @@ h1:hover .hidden {
 
 
 
-
-
-
-
-/* starting  */
 
