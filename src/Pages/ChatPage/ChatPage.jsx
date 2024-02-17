@@ -4,10 +4,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faEllipsisVertical, faSearch } from '@fortawesome/free-solid-svg-icons';
 import toast, { Toaster } from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { listUserHome, searchUsers } from '../../Services/UserApi';
+import { listUserHome, previousChatList, searchUsers } from '../../Services/UserApi';
 import { chatList, baseURL } from '../../Constants/Constants';
 import { Turn as Hamburger } from 'hamburger-react';
 import { Menu, MenuHandler, MenuItem, MenuList } from '@material-tailwind/react';
+import { timeAgo } from './TimeManage';
 function ChatPage() {
     const navigate = useNavigate()
     const token = localStorage.getItem('token')
@@ -52,12 +53,57 @@ function ChatPage() {
 
     }, [searchValues]);
 
-    const handleChat = (event) => {
+    const handleChat = async (event) => {
         setrecipientDetails(event)
+        const prevChat = await previousChatList(user.user_id, event.id)
+        setMessages(prevChat.data);
+        console.log(prevChat.data, '================>>>>>>>>>check chat');
     }
     const closeMenu = () => {
         setOpen(false);
     };
+
+    const setUpChat = async () => {
+        // setUpChat()
+
+
+        // await axios.get(`${Previos_Chat}${senderdetails.id}/${recipientDetails.id}/`).then(
+        //     (response) => {
+        //         if (response.status == 200) {
+        //         }
+        //     }
+        // );
+
+
+
+        // const client = new W3CWebSocket(
+        //     `${WebSocket}${senderdetails.id}/?${recipientDetails.id}`
+        // );
+        // setClientState(client);
+        // client.onopen = () => {
+        //     console.log("WebSocket Client Connected");
+        // };
+
+        // client.onmessage = (message) => {
+        //     const dataFromServer = JSON.parse(message.data);
+
+        //     if (dataFromServer) {
+        //         setMessages((prevMessages) => [
+        //             ...prevMessages,
+        //             {
+        //                 message: dataFromServer.message,
+        //                 sender_email: dataFromServer.senderUsername,
+        //             },
+        //         ]);
+        //     }
+        // };
+
+        // client.onclose = () => {
+        //     console.log("Websocket disconnected");
+        // };
+
+    }
+
 
     return (
         <div className='2xl:grid 2xl:grid-cols-4 xl:grid xl:grid-cols-4 '>
@@ -99,31 +145,58 @@ function ChatPage() {
                 </div>
             </div>
             <div className='2xl:col-span-3 xl:col-span-2 hidden 2xl:block'>
-                <div className='bg-black h-20 border-l-[1px]'>
-                    <div className='flex gap-8 pt-3 pl-10'>
-                        {recipientDetails.profile_image ?
-                            <img src={baseURL + recipientDetails.profile_image} alt="Profile" className="col-span- rounded-full w-14 h-14 " /> :
-                            <div className="bg-[#ffffff] rounded-full w-14 h-14 flex items-center text-xl justify-center text-black uppercase font-bold">
-                                {recipientDetails.username[0]}
-                            </div>}
-                        {/* <div className='flex flex-col justify-start'> 
-                             <h1 className=" text-white text-sm  text-center  ">{recipientDetails.email}</h1>    
-                        </div> */}
-                            <h1 className=" text-white text-xl uppercase text-center pt-3  ">{recipientDetails.username}</h1>
-                            
-                        <div className="col-span- text-center pt-4 ">
-                            <Menu>
-                                <MenuHandler>
-                                    <span className=" absolute right-12 top-4 text-white text-2xl "> <Hamburger toggled={isOpen} toggle={setOpen} /></span>
-                                </MenuHandler>
-                                <MenuList className="max-h-72 text-black font-prompt text-md">
-                                    <MenuItem onClick={closeMenu}>Block</MenuItem>
-                                    <MenuItem onClick={closeMenu}>ClearChat</MenuItem>
-                                </MenuList>
-                            </Menu>
+                <div className='h-screen grid grid-rows-[auto,1fr]'>
+                    <div className='bg-black h-20 border-l-[1px] shadow-lg shadow-[#6b6b6b] '>
+                        <div className='flex gap-8 pt-3 pl-10 '>
+                            {recipientDetails.profile_image ?
+                                <img src={baseURL + recipientDetails.profile_image} alt="Profile" className="col-span- rounded-full w-14 h-14 " /> :
+                                <div className="bg-[#ffffff] rounded-full w-14 h-14 flex items-center text-xl justify-center text-black uppercase font-bold">
+                                    {recipientDetails.username[0]}
+                                </div>}
+                            <div className='flex flex-col justify-start'>
+                                <h1 className=" text-white text-xl uppercase  pt-1  ">{recipientDetails.username}</h1>
+                                <h1 className=" text-white text-sm    ">{recipientDetails.email}</h1>
+                            </div>
+
+                            <div className="col-span- text-center pt-4 ">
+                                <Menu>
+                                    <MenuHandler>
+                                        <span className=" absolute right-12 top-4 text-white text-2xl "> <Hamburger toggled={isOpen} toggle={setOpen} /></span>
+                                    </MenuHandler>
+                                    <MenuList className="max-h-72 text-black font-prompt text-md">
+                                        <MenuItem onClick={closeMenu}>Block</MenuItem>
+                                        <MenuItem onClick={closeMenu}>ClearChat</MenuItem>
+                                        <MenuItem onClick={closeMenu}>Report</MenuItem>
+                                    </MenuList>
+                                </Menu>
+                            </div>
+                        </div>
+                    </div>
+                    <div className='max-h-screen overflow-y-auto hidescroll'>
+                        <div className="grid grid-cols-1">
+                            {messages.map((chatMessage, index) => (
+
+                                <div key={index}>
+                                    {(chatMessage.sender === user.user_id ? <div className='flex justify-end'>
+                                        <div className='flex justify-end'>
+                                            <div className='flex flex-col items-end'> 
+                                                <h1 className='bg-white shadow-md shadow-[#989898] font-prompt p-2 text-black text-center w-fit rounded-lg mt-2 mr-3'>{chatMessage.message}</h1>
+                                                <h1 className='mt-1 mr-4 text-[#7b7b7b] text-[12px]'>{timeAgo(chatMessage.timestamp)}</h1>
+                                            </div>
+                                        </div>
+                                    </div> :
+                                        <div className='flex justify-start'>
+                                            <div>
+                                                <h1 className='bg-[#000000] bgcolors-text shadow-md shadow-[#989898] font-prompt p-2 text-white text-center w-fit rounded-lg mt-2 ml-3'>{chatMessage.message}</h1>
+                                                <h1 className='ml-4 mt-1 text-[#7b7b7b] text-[12px]'>{timeAgo(chatMessage.timestamp)}</h1>
+                                            </div>
+                                        </div>)}
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
+
             </div>
             <div className='w-screen 2xl:hidden '>
                 <div className='bg-black h-20 border-l-[1px]'>

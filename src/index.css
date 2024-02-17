@@ -94,7 +94,7 @@ body {
   
   }
 .text {
-    background-image: var(--gradient-shadow-three);
+    background-image: var(--gradient-shadow-five);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -107,6 +107,13 @@ body {
     background: var(--gradient-shadow-three);
     background-size: 400% 400%;
     animation: slideBackground 60s linear infinite;
+}
+
+.bgcolors-text {
+    overflow: hidden;
+    background: var(--gradient-shadow-two);
+    background-size: 400% 400%;
+    animation: slideBackground 1000s linear infinite;
 }
 
 .googlecolor {

@@ -45,6 +45,7 @@ function Home() {
     navigate('/chat', { state: event })
   }
 
+  console.log(usersList);
 
   return (
     <div>

@@ -9,5 +9,6 @@ export const LoginURL = 'token/'
 export const signupURL = 'signup/' 
 export const chatList = 'chat/connections/' 
 export const chatSearch = 'chat/search/?search=' 
+export const previousChat = 'chat/user-previous-chats/' 
 
 

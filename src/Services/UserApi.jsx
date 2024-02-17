@@ -1,11 +1,24 @@
 import axios from "axios";
 import { UserAxiosInstant } from "../Utils/AxiosUtils";
-import { LoginURL, baseURL, chatList, chatSearch, googleLoginURL, googleSignupURL, signupURL } from "../Constants/Constants";
+import { LoginURL, baseURL, chatList, chatSearch, googleLoginURL, googleSignupURL, previousChat, signupURL } from "../Constants/Constants";
 
 const listUserHome = async (value) => {
     try {
         return await UserAxiosInstant.get(
             `${chatList}${value}/`, {
+            withCredentials: true
+        }  
+        );
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+const previousChatList = async (sender,reciever) => {
+    try {
+        return await UserAxiosInstant.get(
+            `${previousChat}${sender}/${reciever}/`, {
             withCredentials: true
         }  
         );
@@ -70,7 +83,7 @@ const signupGoogleOAuth = async (user) => {
 
 
 
-export { loginGoogleOAuth, signupGoogleOAuth, loginUser,signupUser,listUserHome,searchUsers}
+export { loginGoogleOAuth, signupGoogleOAuth, loginUser,signupUser,listUserHome,searchUsers,previousChatList}
 
 
 
