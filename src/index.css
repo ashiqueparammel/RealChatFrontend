@@ -63,20 +63,6 @@ body {
     }
 } 
 
-/* @keyframes slideBorder  {
-    0% {
-        background-position: 0% 50%;
-    }
-
-    50% {
-        background-position: 100% 50%;
-    }
-
-    100% {
-        background-position: 0% 50%;
-    }
-}  */
-
 
 /* @keyframes rotate {
     0% { --angle: 0deg; --glowColor: var(--gradient-shadow-three);}
