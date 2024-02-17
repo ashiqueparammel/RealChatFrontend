@@ -1,14 +1,15 @@
 import { jwtDecode } from 'jwt-decode';
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faEllipsisVertical, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faEllipsisVertical, faPlus, faSearch } from '@fortawesome/free-solid-svg-icons';
 import toast, { Toaster } from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { listUserHome, previousChatList, searchUsers } from '../../Services/UserApi';
-import { chatList, baseURL } from '../../Constants/Constants';
+import { chatList, baseURL, webSocket } from '../../Constants/Constants';
 import { Turn as Hamburger } from 'hamburger-react';
-import { Menu, MenuHandler, MenuItem, MenuList } from '@material-tailwind/react';
-import { timeAgo } from './TimeManage';
+import { w3cwebsocket as W3CWebSocket } from "websocket";
+import { Button, Menu, MenuHandler, MenuItem, MenuList } from '@material-tailwind/react';
+import { timeAgo } from '../../Helpers/TimeManage';
 function ChatPage() {
     const navigate = useNavigate()
     const token = localStorage.getItem('token')
@@ -17,16 +18,13 @@ function ChatPage() {
     const [usersList, setUsersList] = useState([])
     const [searchValues, setSearchValues] = useState('')
     const [isOpen, setOpen] = useState(false);
+    const [isOpens, setOpens] = useState(false);
     let recipient = location.state || []
     const [clientstate, setClientState] = useState('');
     const [senderdetails, setSenderDetails] = useState(user);
     const [messageText, setMessageText] = useState('')
     const [messages, setMessages] = useState([]);
-    const [ChatList, setChatList] = useState([]);
     const [recipientDetails, setrecipientDetails] = useState(recipient || [])
-
-
-    console.log(recipientDetails, 'lotaaaaaaaaaaaaaaa=======>>>>>');
 
 
     useEffect(() => {
@@ -51,59 +49,64 @@ function ChatPage() {
         return () => clearTimeout(timeoutId);
 
 
-    }, [searchValues]);
+    }, [searchValues, recipientDetails]);
+
 
     const handleChat = async (event) => {
         setrecipientDetails(event)
         const prevChat = await previousChatList(user.user_id, event.id)
         setMessages(prevChat.data);
-        console.log(prevChat.data, '================>>>>>>>>>check chat');
+
+        const client = new W3CWebSocket(
+            `${webSocket}${user.user_id}/?${event.id}`
+        );
+        setClientState(client);
+        client.onopen = () => {
+            console.log("WebSocket Client Connected", client);
+        };
+
+        client.onmessage = (message) => {
+            const dataFromServer = JSON.parse(message.data);
+
+            if (dataFromServer) {
+                setMessages((prevMessages) => [
+                    ...prevMessages,
+                    {
+                        message: dataFromServer.message,
+                        sender_email: dataFromServer.senderUsername,
+                    },
+                ]);
+            }
+        };
+
+        client.onclose = () => {
+            console.log("Websocket disconnected");
+        };
+    }
+
+
+
+    const sendMessage = () => {
+        if (messageText.trim() === '') {
+            return;
+        } else {
+            clientstate.send(
+                JSON.stringify({
+                    message: messageText,
+                    senderUsername: senderdetails.email,
+                    recieverUsername: recipientDetails.email,
+                })
+            );
+            setMessageText('');
+        };
     }
     const closeMenu = () => {
         setOpen(false);
     };
 
-    const setUpChat = async () => {
-        // setUpChat()
-
-
-        // await axios.get(`${Previos_Chat}${senderdetails.id}/${recipientDetails.id}/`).then(
-        //     (response) => {
-        //         if (response.status == 200) {
-        //         }
-        //     }
-        // );
-
-
-
-        // const client = new W3CWebSocket(
-        //     `${WebSocket}${senderdetails.id}/?${recipientDetails.id}`
-        // );
-        // setClientState(client);
-        // client.onopen = () => {
-        //     console.log("WebSocket Client Connected");
-        // };
-
-        // client.onmessage = (message) => {
-        //     const dataFromServer = JSON.parse(message.data);
-
-        //     if (dataFromServer) {
-        //         setMessages((prevMessages) => [
-        //             ...prevMessages,
-        //             {
-        //                 message: dataFromServer.message,
-        //                 sender_email: dataFromServer.senderUsername,
-        //             },
-        //         ]);
-        //     }
-        // };
-
-        // client.onclose = () => {
-        //     console.log("Websocket disconnected");
-        // };
-
+  const  handleAddDocument = () => {
+        setOpens(!isOpens)
     }
-
 
     return (
         <div className='2xl:grid 2xl:grid-cols-4 xl:grid xl:grid-cols-4 '>
@@ -175,25 +178,58 @@ function ChatPage() {
                     <div className='max-h-screen overflow-y-auto hidescroll'>
                         <div className="grid grid-cols-1">
                             {messages.map((chatMessage, index) => (
-
                                 <div key={index}>
-                                    {(chatMessage.sender === user.user_id ? <div className='flex justify-end'>
+                                    {chatMessage.sender_email === senderdetails.email ? (
                                         <div className='flex justify-end'>
-                                            <div className='flex flex-col items-end'> 
-                                                <h1 className='bg-white shadow-md shadow-[#989898] font-prompt p-2 text-black text-center w-fit rounded-lg mt-2 mr-3'>{chatMessage.message}</h1>
-                                                <h1 className='mt-1 mr-4 text-[#7b7b7b] text-[12px]'>{timeAgo(chatMessage.timestamp)}</h1>
+                                            <div className='flex justify-end'>
+                                                <div className='flex flex-col items-end'>
+                                                    <Menu>
+                                                        <MenuHandler>
+                                                            <h1 className='bg-white shadow-md shadow-[#989898] font-prompt p-2 text-black text-center tracking-wider w-fit rounded-tl-lg rounded-tr-lg rounded-bl-lg mt-2 mr-3 hover:cursor-pointer nonedit'>
+                                                                {chatMessage.message}
+                                                                <span><FontAwesomeIcon className='hidden ml-1' color='black' icon={faEllipsisVertical} /></span>
+                                                            </h1>
+                                                        </MenuHandler>
+                                                        <MenuList className="max-h-72 text-black font-prompt text-sm">
+                                                            <MenuItem>Delete for everyone</MenuItem>
+                                                            <MenuItem>Delete for me</MenuItem>
+
+                                                        </MenuList>
+                                                    </Menu>
+
+                                                    <h1 className='mt-1 mr-4 text-[#7b7b7b] text-[12px]'>{timeAgo(chatMessage.timestamp) == "NaN years ago" ? "just now" : timeAgo(chatMessage.timestamp)}</h1>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div> :
+                                    ) : (
                                         <div className='flex justify-start'>
                                             <div>
-                                                <h1 className='bg-[#000000] bgcolors-text shadow-md shadow-[#989898] font-prompt p-2 text-white text-center w-fit rounded-lg mt-2 ml-3'>{chatMessage.message}</h1>
-                                                <h1 className='ml-4 mt-1 text-[#7b7b7b] text-[12px]'>{timeAgo(chatMessage.timestamp)}</h1>
+                                                <Menu className=''>
+                                                    <MenuHandler>
+                                                        <h1 className='bg-[#000000]  shadow-md shadow-[#989898] font-prompt p-2 text-white text-center tracking-wider rounded-tl-lg  rounded-tr-lg rounded-br-lg w-fit  mt-2 ml-3'>{chatMessage.message}
+                                                            <span><FontAwesomeIcon className='hidden ml-2' color='white' icon={faEllipsisVertical} /></span></h1>
+                                                    </MenuHandler>
+
+                                                    <MenuList className="max-h-72 text-black font-prompt text-sm">
+                                                        <MenuItem>Delete for everyone</MenuItem>
+                                                        <MenuItem>Delete for me</MenuItem>
+                                                    </MenuList>
+                                                </Menu>
+                                                <h1 className='ml-4 mt-1 text-[#7b7b7b] text-[12px]'>{timeAgo(chatMessage.timestamp) == "NaN years ago" ? "just now" : timeAgo(chatMessage.timestamp)}</h1>
                                             </div>
-                                        </div>)}
+                                        </div>
+                                    )}
                                 </div>
                             ))}
+
+
                         </div>
+                    </div>
+                    <div className='flex justify-items-center ml-5'>
+                        <FontAwesomeIcon onClick={handleAddDocument} icon={faPlus} className={`plus-icon ${isOpens ? 'rotate-45' : ''}`} />
+
+                        <input type="text" value={messageText} onChange={(e) => setMessageText(e.target.value)} className='w-[80%] h-12  rounded-md  border-[1px] border-black font-prompt' placeholder='Type a message' style={{ paddingLeft: '20px' }} />
+                        <Button onClick={sendMessage} className='w-16 h-12 ml-4 bg-[#051339] '></Button>
                     </div>
                 </div>
 

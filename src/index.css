@@ -9,7 +9,12 @@
     box-sizing: border-box;
 }
 
-
+h1 {
+    user-select: none;
+}
+div{
+    user-select: none;
+}
 
 :root {
     /* --gradient-shadow-two: linear-gradient(300deg, #68d391, #38b2ac, #3498db); */
@@ -109,6 +114,7 @@ body {
     animation: slideBackground 60s linear infinite;
 }
 
+
 .bgcolors-text {
     overflow: hidden;
     background: var(--gradient-shadow-two);
@@ -130,7 +136,15 @@ body {
     font-size: 17px;
 
 }
+h1:hover .hidden {
+    display: inline-block;
+    
+  }
 
+.rotate-45 {
+    transform: rotate(45deg);
+  }  
+  
 .signupfont{
     font-family: Montserrat,
     Trebuchet MS, Lucida Grande,
