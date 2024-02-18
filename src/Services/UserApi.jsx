@@ -1,13 +1,13 @@
 import axios from "axios";
 import { UserAxiosInstant } from "../Utils/AxiosUtils";
-import { LoginURL, baseURL, chatList, chatSearch, googleLoginURL, googleSignupURL, previousChat, signupURL } from "../Constants/Constants";
+import { LoginURL, baseURL, chatList, chatSearch, clearHistory, deleteMessageForMe, googleLoginURL, googleSignupURL, logoutUser, previousChat, signupURL } from "../Constants/Constants";
 
 const listUserHome = async (value) => {
     try {
         return await UserAxiosInstant.get(
             `${chatList}${value}/`, {
             withCredentials: true
-        }  
+        }
         );
     } catch (error) {
         console.log(error);
@@ -15,12 +15,12 @@ const listUserHome = async (value) => {
 }
 
 
-const previousChatList = async (sender,reciever) => {
+const previousChatList = async (sender, reciever) => {
     try {
         return await UserAxiosInstant.get(
             `${previousChat}${sender}/${reciever}/`, {
             withCredentials: true
-        }  
+        }
         );
     } catch (error) {
         console.log(error);
@@ -31,9 +31,9 @@ const previousChatList = async (sender,reciever) => {
 const searchUsers = async (value) => {
     try {
         return await UserAxiosInstant.get(
-            chatSearch+value, {
+            chatSearch + value, {
             withCredentials: true
-        }  
+        }
         );
     } catch (error) {
         console.log(error);
@@ -46,6 +46,32 @@ const loginGoogleOAuth = async (user) => {
         const response = await axios.post(baseURL + googleLoginURL, user);
         return response.data
     } catch (error) {
+        return error;
+    }
+}
+
+const messageDeleteForMe = async (data) => {
+    try {
+        return await UserAxiosInstant.post(
+            baseURL + deleteMessageForMe, data, {
+            withCredentials: true
+        }
+        );
+    }
+    catch (error) {
+        return error;
+    }
+}
+
+const clearChatHistory = async (data) => {
+    try {
+        return await UserAxiosInstant.post(
+            baseURL + clearHistory, data, {
+            withCredentials: true
+        }
+        );
+    }
+    catch (error) {
         return error;
     }
 }
@@ -81,9 +107,26 @@ const signupGoogleOAuth = async (user) => {
     }
 }
 
+const userLogout = async () => {
+    const authToken = localStorage.getItem('token');
+    const accessToken = JSON.parse(authToken);
+    const data = {refresh_token:accessToken.refresh}
+    try {
+        return await UserAxiosInstant.post(
+            baseURL + logoutUser, data, {
+            withCredentials: true
+        }
+        );
+    }
+    catch (error) {
+        return error;
+    }
+}
 
 
-export { loginGoogleOAuth, signupGoogleOAuth, loginUser,signupUser,listUserHome,searchUsers,previousChatList}
+
+
+export { loginGoogleOAuth, signupGoogleOAuth, loginUser, signupUser, listUserHome, searchUsers, previousChatList, messageDeleteForMe, clearChatHistory ,userLogout}
 
 
 

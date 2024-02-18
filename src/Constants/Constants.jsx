@@ -11,5 +11,8 @@ export const signupURL = 'signup/'
 export const chatList = 'chat/connections/' 
 export const chatSearch = 'chat/search/?search=' 
 export const previousChat = 'chat/user-previous-chats/' 
+export const deleteMessageForMe = 'chat/delete_message/' 
+export const clearHistory = 'chat/clear_history/' 
+export const logoutUser = 'logout/' 
 
 

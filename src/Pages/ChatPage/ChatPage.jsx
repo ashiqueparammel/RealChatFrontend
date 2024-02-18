@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faEllipsisVertical, faPlus, faSearch } from '@fortawesome/free-solid-svg-icons';
 import toast, { Toaster } from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { listUserHome, previousChatList, searchUsers } from '../../Services/UserApi';
+import { clearChatHistory, listUserHome, messageDeleteForMe, previousChatList, searchUsers } from '../../Services/UserApi';
 import { chatList, baseURL, webSocket } from '../../Constants/Constants';
 import { Turn as Hamburger } from 'hamburger-react';
 import { w3cwebsocket as W3CWebSocket } from "websocket";
@@ -27,6 +27,7 @@ function ChatPage() {
     const [messageText, setMessageText] = useState('')
     const [messages, setMessages] = useState([]);
     const [recipientDetails, setrecipientDetails] = useState(recipient || [])
+    const [managePage, setManagePage] = useState(false)
 
 
     const handleChat = async () => {
@@ -90,6 +91,7 @@ function ChatPage() {
 
     useEffect(() => {
         let timeoutId;
+        setManagePage(false)
         setLoadingManage(false)
         if (searchValues !== '') {
             const throttledSearchHandle = async () => {
@@ -115,9 +117,45 @@ function ChatPage() {
         }
         return () => clearTimeout(timeoutId);
 
-    }, [searchValues, recipientDetails]);
+    }, [searchValues, recipientDetails, managePage]);
 
 
+    const deleteChatForMeHandle = async (event) => {
+        const data = {
+            user_id: senderdetails.user_id,
+            message_id: event
+        }
+        const deleteMessage = await messageDeleteForMe(data)
+        if (deleteMessage.status === 200) {
+            toast.success('Message deleted!')
+            setManagePage(true)
+
+
+        }
+        else {
+            toast.error('network error!')
+
+        }
+
+    }
+
+    const clearChat = async () => {
+        const data = {
+            requested_user:senderdetails.user_id,
+            second_user:recipientDetails.id,
+        }
+        const clearHistoryChat = await clearChatHistory(data)
+        if (clearHistoryChat.status === 200) {
+            toast.success('All History Cleard!')
+            closeMenu()
+            setManagePage(true)
+
+        }
+        else {
+            toast.error('network error!')
+
+        }
+    }
 
 
     return (
@@ -182,7 +220,7 @@ function ChatPage() {
                                     </MenuHandler>
                                     <MenuList className="max-h-72 text-black font-prompt text-md">
                                         <MenuItem onClick={closeMenu}>Block</MenuItem>
-                                        <MenuItem onClick={closeMenu}>ClearChat</MenuItem>
+                                        <MenuItem onClick={clearChat}>ClearChat</MenuItem>
                                         <MenuItem onClick={closeMenu}>Report</MenuItem>
                                     </MenuList>
                                 </Menu>
@@ -206,7 +244,7 @@ function ChatPage() {
                                                         </MenuHandler>
                                                         <MenuList className="max-h-72 text-black font-prompt text-sm">
                                                             <MenuItem>Delete for everyone</MenuItem>
-                                                            <MenuItem>Delete for me</MenuItem>
+                                                            <MenuItem onClick={() => deleteChatForMeHandle(chatMessage.id)}>Delete for me</MenuItem>
 
                                                         </MenuList>
                                                     </Menu>
@@ -225,7 +263,7 @@ function ChatPage() {
                                                     </MenuHandler>
 
                                                     <MenuList className="max-h-72 text-black font-prompt text-sm">
-                                                        <MenuItem>Delete for me</MenuItem>
+                                                        <MenuItem onClick={() => deleteChatForMeHandle(chatMessage.id)}>Delete for me</MenuItem>
                                                     </MenuList>
                                                 </Menu>
                                                 <h1 className='ml-4 mt-1 text-[#7b7b7b] text-[12px]'>{timeAgo(chatMessage.timestamp) == "NaN years ago" ? "just now" : timeAgo(chatMessage.timestamp)}</h1>
@@ -294,7 +332,7 @@ function ChatPage() {
                                                         </MenuHandler>
                                                         <MenuList className="max-h-72 text-black font-prompt text-sm  ">
                                                             <MenuItem>Delete for everyone</MenuItem>
-                                                            <MenuItem>Delete for me</MenuItem>
+                                                            <MenuItem onClick={() => deleteChatForMeHandle(chatMessage.id)}>Delete for me</MenuItem>
                                                         </MenuList>
                                                     </Menu>
                                                     <h1 className='mt-1 mr-4 text-[#7b7b7b] text-[12px]'>{timeAgo(chatMessage.timestamp) == "NaN years ago" ? "just now" : timeAgo(chatMessage.timestamp)}</h1>
@@ -310,8 +348,7 @@ function ChatPage() {
                                                             <span><FontAwesomeIcon className='hidden ml-2' color='white' icon={faEllipsisVertical} /></span></h1>
                                                     </MenuHandler>
                                                     <MenuList className="max-h-72 text-black font-prompt text-sm">
-                                                        <MenuItem>Delete for everyone</MenuItem>
-                                                        <MenuItem>Delete for me</MenuItem>
+                                                        <MenuItem onClick={() => deleteChatForMeHandle(chatMessage.id)}>Delete for me</MenuItem>
                                                     </MenuList>
                                                 </Menu>
                                                 <h1 className='ml-4 mt-1 text-[#7b7b7b] text-[12px]'>{timeAgo(chatMessage.timestamp) == "NaN years ago" ? "just now" : timeAgo(chatMessage.timestamp)}</h1>
