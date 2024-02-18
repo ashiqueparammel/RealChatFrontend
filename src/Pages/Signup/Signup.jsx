@@ -123,7 +123,7 @@ function Signup() {
 
     const navigate = useNavigate()
     return (
-        <div className='bg-[#000000] w-full h-screen flex justify-center '>
+        <div className='bg-[#000000] w-full h-svh flex justify-center '>
             <Card className='bg-transparent  h-[60%] 2xl:w-[35%] xl:w-[40%] lg:w-[40%] md:w-[50%] 2xl:mt-40 xl:mt-28 lg:mt-24 md:mt-20 sm:mt-14 mt-10 w-[90%] sm:w-[80%] flex flex-col justify-center shadow-none items-center rounded-lg gap-5'>
                 <Typography className='font-prompt text-[#FAFAFA] text-3xl 2xl:absolute 2xl:-top-14'>SIGN UP</Typography>
                 <input

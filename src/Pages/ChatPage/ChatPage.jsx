@@ -243,7 +243,7 @@ function ChatPage() {
             </div>
 
             <div className='w-screen 2xl:hidden'>
-                <div className='h-screen grid grid-rows-[auto,1fr]'>
+                <div className='h-svh grid grid-rows-[auto,1fr]'>
                     <div className='bg-black h-20 border-l-[1px] shadow-lg shadow-[#6b6b6b]'>
                         <div className='grid grid-cols-4 gap-4 pt-3 pl-4'>
                             {recipientDetails.profile_image ? (
