@@ -10,6 +10,7 @@ import axios from 'axios';
 import { loginUser, signupGoogleOAuth, signupUser } from '../../Services/UserApi';
 import { jwtDecode } from 'jwt-decode';
 import Validforms from '../../Helpers/Validforms';
+import LogoSpinner from '../../Helpers/LogoSpinner';
 
 
 function Signup() {
@@ -17,6 +18,9 @@ function Signup() {
     const [username, setUsername] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [LoadingManage, setLoadingManage] = useState(false)
+    const navigate = useNavigate()
+
 
     let googleData = ''
     const signupWithGoogleAuth = useGoogleLogin({
@@ -29,6 +33,8 @@ function Signup() {
 
     const GoogleAuth = async () => {
         try {
+            setLoadingManage(true)
+
             if (!googleData) return;
             const tokenData = await axios.get(
                 google_Access_Token + googleData.access_token,
@@ -61,18 +67,23 @@ function Signup() {
                         const token = jwtDecode(userToken.data.access)
                         localStorage.setItem('token', JSON.stringify(userToken.data));
                         if (token.is_active === true && token.is_superuser === false) {
+                            setLoadingManage(false)
+
                             navigate('/');
                         }
                     } catch (error) {
                         console.error('Error decoding JWT:', error);
+                        setLoadingManage(false)
                         toast.error(error.message);
                     }
                 }
             } catch (error) {
                 console.error('Error login:', error);
+                setLoadingManage(false)
                 toast.error(error.message);
             }
         } catch (error) {
+            setLoadingManage(false)
             toast.error(error.message);
         }
     };
@@ -89,10 +100,11 @@ function Signup() {
         }
         const is_Valid = Validforms(user)
         if (is_Valid) {
-
+            setLoadingManage(true)
             const signupData = await signupUser(user)
             console.log(signupData);
             if (signupData.status === 201) {
+                setLoadingManage(false)
                 toast.success(signupData.Text)
                 setTimeout(() => {
                     toast.success('Check Your Mail and Activate Your Account!')
@@ -105,6 +117,7 @@ function Signup() {
             }
 
             if (signupData.status === 404) {
+                setLoadingManage(false)
                 if (signupData.Text.email) {
                     toast.error(signupData.Text.email)
                 }
@@ -121,9 +134,11 @@ function Signup() {
 
     }
 
-    const navigate = useNavigate()
     return (
         <div className='bg-[#000000] w-full h-svh flex justify-center '>
+            <>
+                {(LoadingManage ? <div className='bg-opacity-50 items-center '><LogoSpinner /></div> : '')}
+            </>
             <Card className='bg-transparent  h-[60%] 2xl:w-[35%] xl:w-[40%] lg:w-[40%] md:w-[50%] 2xl:mt-40 xl:mt-28 lg:mt-24 md:mt-20 sm:mt-14 mt-10 w-[90%] sm:w-[80%] flex flex-col justify-center shadow-none items-center rounded-lg gap-5'>
                 <Typography className='font-prompt text-[#FAFAFA] text-3xl 2xl:absolute 2xl:-top-14'>SIGN UP</Typography>
                 <input

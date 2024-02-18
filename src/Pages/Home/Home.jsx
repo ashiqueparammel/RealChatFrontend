@@ -6,6 +6,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { listUserHome, searchUsers } from '../../Services/UserApi';
 import { baseURL } from '../../Constants/Constants';
+import LogoSpinner from '../../Helpers/LogoSpinner';
 
 function Home() {
   const navigate = useNavigate()
@@ -14,25 +15,29 @@ function Home() {
   const user = decoded
   const [usersList, setUsersList] = useState([])
   const [searchValues, setSearchValues] = useState('')
-
+  const [LoadingManage, setLoadingManage] = useState(false)
 
 
   useEffect(() => {
     let timeoutId;
 
     if (searchValues !== '') {
+      setLoadingManage(true)
       const throttledSearchHandle = async () => {
         const searchData = await searchUsers(searchValues);
         setUsersList(searchData.data)
+        setLoadingManage(false)
       };
 
       clearTimeout(timeoutId);
       timeoutId = setTimeout(throttledSearchHandle, 500);
     }
     else {
+      setLoadingManage(true)
       const listChatUsers = async () => {
         const data = await listUserHome(user.user_id)
         setUsersList(data.data.connections)
+        setLoadingManage(false)
       }
       listChatUsers();
     }
@@ -47,7 +52,10 @@ function Home() {
 
   return (
     <div>
-      <div className="py-10 h-screen bg-[#000000] px-2 ">
+      <>
+        {(LoadingManage ? <div className='bg-opacity-50 items-center '><LogoSpinner /></div> : '')}
+      </>
+      <div className="py-10 h-svh bg-[#000000] px-2 ">
         <div className="max-w-md mx-auto bg-transparent shadow-lg rounded-lg   md:max-w-lg">
           <div className="md:flex">
             <div className="w-full p-4">
@@ -61,7 +69,7 @@ function Home() {
                       <div className="grid grid-cols-5 gap-4">
                         <div className="col-span-1">
                           {chatuser.profile_image ?
-                            <img src={baseURL+chatuser.profile_image} alt="Profile" className="rounded-full w-10 h-10" /> :
+                            <img src={baseURL + chatuser.profile_image} alt="Profile" className="rounded-full w-10 h-10" /> :
                             <div className="bg-[#000000] rounded-full w-10 h-10 flex items-center justify-center text-white uppercase font-bold">
                               {chatuser.username[0]}
                             </div>

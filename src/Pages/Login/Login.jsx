@@ -10,23 +10,26 @@ import { loginGoogleOAuth, loginUser } from '../../Services/UserApi';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import Validforms from '../../Helpers/Validforms';
+import LogoSpinner from '../../Helpers/LogoSpinner';
 
 function Login() {
     const location = useLocation();
+    const [LoadingManage, setLoadingManage] = useState(false)
+
     let message = new URLSearchParams(location.search)?.get('message') ?? null;
 
-  useEffect(() => {
-    if (message) {
-        toast.success(message)
-        message=null
-    }
-  }, [message])
-  
+    useEffect(() => {
+        if (message) {
+            toast.success(message)
+            message = null
+        }
+    }, [message])
+
 
     const navigate = useNavigate()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-   
+
     let googleData = ''
     const LoginWithGoogleAuth = useGoogleLogin({
         onSuccess: (codeResponse) => {
@@ -41,6 +44,7 @@ function Login() {
 
     const GoogleAuth = async () => {
         try {
+            setLoadingManage(true)
             if (!googleData) return;
             const tokenData = await axios.get(
                 google_Access_Token + googleData.access_token,
@@ -65,6 +69,8 @@ function Login() {
                         const token = jwtDecode(userToken.access)
                         localStorage.setItem('token', JSON.stringify(userToken));
                         if (token.is_active === true && token.is_superuser === false) {
+                            setLoadingManage(false)
+
                             toast.success(data.message);
                             setTimeout(() => {
                                 navigate('/');
@@ -72,17 +78,25 @@ function Login() {
 
                         }
                     } catch (error) {
+                        setLoadingManage(false)
+
                         toast.error(error.message);
                     }
                 }
                 else {
                     toast.error(data.message);
+                    setLoadingManage(false)
+
                 }
             } catch (error) {
                 toast.error(error.message);
+                setLoadingManage(false)
+
             }
         } catch (error) {
             toast.error(error.message);
+            setLoadingManage(false)
+
         }
     };
 
@@ -93,6 +107,8 @@ function Login() {
         }
         const is_Valid = Validforms(user)
         if (is_Valid) {
+            setLoadingManage(true)
+
             const token = await loginUser(user)
             console.log(token);
             if (token.status === 200) {
@@ -101,6 +117,8 @@ function Login() {
                     const token = jwtDecode(userToken.access)
                     localStorage.setItem('token', JSON.stringify(userToken));
                     if (token.is_active === true && token.is_superuser === false) {
+                        setLoadingManage(false)
+
                         toast.success('Login successfully! ');
                         setTimeout(() => {
                             navigate('/');
@@ -108,10 +126,14 @@ function Login() {
                     }
                 } catch (error) {
                     toast.error(error.message);
+                    setLoadingManage(false)
+
                 }
 
             }
             else if (token.response.status === 401) {
+                setLoadingManage(false)
+
                 toast.error(token.response.data.detail)
             }
         }
@@ -119,6 +141,9 @@ function Login() {
 
     return (
         <div className='bg-[#000000]  w-full h-svh flex justify-center '>
+            <>
+                {(LoadingManage ? <div className='bg-opacity-50 items-center '><LogoSpinner /></div> : '')}
+            </>
             <Card className='bg-transparent  h-[60%] 2xl:w-[35%] xl:w-[40%] lg:w-[40%] md:w-[50%] 2xl:mt-40 xl:mt-28 lg:mt-24 md:mt-20 sm:mt-14 mt-10 w-[90%] sm:w-[80%] flex flex-col justify-center shadow-none items-center rounded-lg gap-5'>
                 <Typography className='font-prompt text-[#FAFAFA] text-3xl 2xl:absolute 2xl:-top-5'>LOGIN</Typography>
                 <input onChange={(e) => setEmail(e.target.value)}

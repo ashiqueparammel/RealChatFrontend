@@ -10,10 +10,12 @@ import { Turn as Hamburger } from 'hamburger-react';
 import { w3cwebsocket as W3CWebSocket } from "websocket";
 import { Button, Menu, MenuHandler, MenuItem, MenuList } from '@material-tailwind/react';
 import { timeAgo } from '../../Helpers/TimeManage';
+import LogoSpinner from '../../Helpers/LogoSpinner';
 function ChatPage() {
     const navigate = useNavigate()
     const token = localStorage.getItem('token')
     const user = jwtDecode(token);
+    const [LoadingManage, setLoadingManage] = useState(false)
     const location = useLocation()
     const [usersList, setUsersList] = useState([])
     const [searchValues, setSearchValues] = useState('')
@@ -88,7 +90,7 @@ function ChatPage() {
 
     useEffect(() => {
         let timeoutId;
-
+        setLoadingManage(false)
         if (searchValues !== '') {
             const throttledSearchHandle = async () => {
                 const searchData = await searchUsers(searchValues);
@@ -108,6 +110,9 @@ function ChatPage() {
         if (senderdetails.user_id != null && recipientDetails.id != null) {
             handleChat();
         }
+        if (!recipientDetails) {
+            setLoadingManage(true)
+        }
         return () => clearTimeout(timeoutId);
 
     }, [searchValues, recipientDetails]);
@@ -117,7 +122,9 @@ function ChatPage() {
 
     return (
         <div className='2xl:grid 2xl:grid-cols-4 xl:grid xl:grid-cols-4 '>
-
+            <>
+                {(LoadingManage ? <div className='bg-opacity-50 items-center '><LogoSpinner /></div> : '')}
+            </>
             <div className='2xl:col-span-1 xl:col-span-2 hidden 2xl:block'>
                 <div className="py-10 h-screen bg-[#000000] px-2 ">
                     <div className="max-w-md mx-auto bg-transparent shadow-lg rounded-lg 2xl:text-sm  xl:text-xs  md:max-w-lg">
@@ -218,7 +225,6 @@ function ChatPage() {
                                                     </MenuHandler>
 
                                                     <MenuList className="max-h-72 text-black font-prompt text-sm">
-                                                        <MenuItem>Delete for everyone</MenuItem>
                                                         <MenuItem>Delete for me</MenuItem>
                                                     </MenuList>
                                                 </Menu>
