@@ -1,6 +1,12 @@
 import axios from "axios";
 import { UserAxiosInstant } from "../Utils/AxiosUtils";
-import { LoginURL, baseURL, chatList, chatSearch, clearHistory, deleteMessageForMe, googleLoginURL, googleSignupURL, logoutUser, previousChat, signupURL } from "../Constants/Constants";
+import {
+    LoginURL, baseURL, chatList,
+    chatSearch, clearHistory, deleteMessageEveryone,
+    deleteMessageForMe, googleLoginURL,
+    googleSignupURL, logoutUser, previousChat
+    , signupURL
+} from "../Constants/Constants";
 
 const listUserHome = async (value) => {
     try {
@@ -63,6 +69,21 @@ const messageDeleteForMe = async (data) => {
     }
 }
 
+
+const messageDeleteForEveryOne = async (data) => {
+    try {
+        return await UserAxiosInstant.post(
+            baseURL + deleteMessageEveryone, data, {
+            withCredentials: true
+        }
+        );
+    }
+    catch (error) {
+        return error;
+    }
+}
+
+
 const clearChatHistory = async (data) => {
     try {
         return await UserAxiosInstant.post(
@@ -110,7 +131,7 @@ const signupGoogleOAuth = async (user) => {
 const userLogout = async () => {
     const authToken = localStorage.getItem('token');
     const accessToken = JSON.parse(authToken);
-    const data = {refresh_token:accessToken.refresh}
+    const data = { refresh_token: accessToken.refresh }
     try {
         return await UserAxiosInstant.post(
             baseURL + logoutUser, data, {
@@ -126,7 +147,12 @@ const userLogout = async () => {
 
 
 
-export { loginGoogleOAuth, signupGoogleOAuth, loginUser, signupUser, listUserHome, searchUsers, previousChatList, messageDeleteForMe, clearChatHistory ,userLogout}
+export {
+    loginGoogleOAuth, signupGoogleOAuth,
+    loginUser, signupUser, listUserHome,
+    searchUsers, previousChatList, messageDeleteForMe,
+    clearChatHistory, userLogout, messageDeleteForEveryOne
+}
 
 
 

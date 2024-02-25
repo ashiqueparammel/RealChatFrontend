@@ -12,6 +12,7 @@ export const chatList = 'chat/connections/'
 export const chatSearch = 'chat/search/?search=' 
 export const previousChat = 'chat/user-previous-chats/' 
 export const deleteMessageForMe = 'chat/delete_message/' 
+export const deleteMessageEveryone = 'chat/delete_message_everyone/' 
 export const clearHistory = 'chat/clear_history/' 
 export const logoutUser = 'logout/' 
 

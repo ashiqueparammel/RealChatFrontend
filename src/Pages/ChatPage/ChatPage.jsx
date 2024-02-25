@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faEllipsisVertical, faPlus, faSearch } from '@fortawesome/free-solid-svg-icons';
 import toast, { Toaster } from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { clearChatHistory, listUserHome, messageDeleteForMe, previousChatList, searchUsers } from '../../Services/UserApi';
+import { clearChatHistory, listUserHome, messageDeleteForEveryOne, messageDeleteForMe, previousChatList, searchUsers } from '../../Services/UserApi';
 import { chatList, baseURL, webSocket } from '../../Constants/Constants';
 import { Turn as Hamburger } from 'hamburger-react';
 import { w3cwebsocket as W3CWebSocket } from "websocket";
@@ -44,23 +44,25 @@ function ChatPage() {
 
         client.onmessage = (message) => {
             const dataFromServer = JSON.parse(message.data);
-
             if (dataFromServer) {
-                setMessages((prevMessages) => [
-                    ...prevMessages,
-                    {
-                        message: dataFromServer.message,
-                        sender_email: dataFromServer.senderUsername,
-                    },
-                ]);
+                if (dataFromServer.deleteMessageId) {
+                    setMessages((prevMessages) => prevMessages.filter((msg) => msg.id !== dataFromServer.deleteMessageId));
+                } else {
+                    setMessages((prevMessages) => [
+                        ...prevMessages,
+                        {
+                            message: dataFromServer.message,
+                            sender_email: dataFromServer.senderUsername,
+                        },
+                    ]);
+                }
             }
-        };
 
+        };
         client.onclose = () => {
             console.log("Websocket disconnected");
         };
     }
-
 
     const sendMessage = () => {
         if (messageText.trim() === '') {
@@ -98,7 +100,6 @@ function ChatPage() {
                 const searchData = await searchUsers(searchValues);
                 setUsersList(searchData.data)
             };
-
             clearTimeout(timeoutId);
             timeoutId = setTimeout(throttledSearchHandle, 500);
         }
@@ -129,34 +130,47 @@ function ChatPage() {
         if (deleteMessage.status === 200) {
             toast.success('Message deleted!')
             setManagePage(true)
-
-
         }
         else {
             toast.error('network error!')
-
         }
-
     }
 
     const clearChat = async () => {
         const data = {
-            requested_user:senderdetails.user_id,
-            second_user:recipientDetails.id,
+            requested_user: senderdetails.user_id,
+            second_user: recipientDetails.id,
         }
         const clearHistoryChat = await clearChatHistory(data)
         if (clearHistoryChat.status === 200) {
             toast.success('All History Cleard!')
             closeMenu()
             setManagePage(true)
-
         }
         else {
             toast.error('network error!')
-
         }
     }
 
+    const deleteChatForEveryOneHandle = async (event) => {
+        const data = {
+            user_id: senderdetails.user_id,
+            message_id: event
+        }
+        const deleteMessage = await messageDeleteForEveryOne(data)
+        if (deleteMessage.status === 200) {
+            toast.success('Message deleted EveryOne!')
+            clientstate.send(
+                JSON.stringify({
+                    deleteMessageId: event,
+                })
+            );
+            setManagePage(true)
+        }
+        else {
+            toast.error('network error!')
+        }
+    }
 
     return (
         <div className='2xl:grid 2xl:grid-cols-4 xl:grid xl:grid-cols-4 '>
@@ -243,7 +257,7 @@ function ChatPage() {
                                                             </h1>
                                                         </MenuHandler>
                                                         <MenuList className="max-h-72 text-black font-prompt text-sm">
-                                                            <MenuItem>Delete for everyone</MenuItem>
+                                                            <MenuItem onClick={() => deleteChatForEveryOneHandle(chatMessage.id)}>Delete for everyone</MenuItem>
                                                             <MenuItem onClick={() => deleteChatForMeHandle(chatMessage.id)}>Delete for me</MenuItem>
 
                                                         </MenuList>
@@ -308,7 +322,7 @@ function ChatPage() {
                                     </MenuHandler>
                                     <MenuList className="max-h-72 text-black font-prompt text-md">
                                         <MenuItem onClick={closeMenu}>Block</MenuItem>
-                                        <MenuItem onClick={closeMenu}>ClearChat</MenuItem>
+                                        <MenuItem onClick={clearChat}>ClearChat</MenuItem>
                                         <MenuItem onClick={closeMenu}>Report</MenuItem>
                                     </MenuList>
                                 </Menu>
@@ -331,7 +345,7 @@ function ChatPage() {
                                                             </h1>
                                                         </MenuHandler>
                                                         <MenuList className="max-h-72 text-black font-prompt text-sm  ">
-                                                            <MenuItem>Delete for everyone</MenuItem>
+                                                            <MenuItem onClick={() => deleteChatForEveryOneHandle(chatMessage.id)}>Delete for everyone</MenuItem>
                                                             <MenuItem onClick={() => deleteChatForMeHandle(chatMessage.id)}>Delete for me</MenuItem>
                                                         </MenuList>
                                                     </Menu>
