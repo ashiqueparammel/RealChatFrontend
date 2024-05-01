@@ -56,6 +56,7 @@ function Login() {
                 }
             );
             const access_token = googleData.access_token
+            console.log(access_token,'====================>>>>>>>>>');
             googleData = tokenData.data;
             const googleUser = {
                 email: googleData.email,
