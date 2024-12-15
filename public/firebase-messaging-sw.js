@@ -1,15 +1,15 @@
-importScripts('https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js');
-importScripts('https://www.gstatic.com/firebasejs/9.14.0/firebase-messaging.js');
+importScripts('https://www.gstatic.com/firebasejs/8.2.0/firebase-app.js');
+importScripts('https://www.gstatic.com/firebasejs/8.2.0/firebase-messaging.js');
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDxXxXxXxXxXxXxXxXxXxXxXxXxXxXx",
-    authDomain: "livichat-1ad9c.firebaseapp.com",
-    projectId: "livichat-1ad9c",
-    storageBucket: "livichat-1ad9c.appspot.com",
-    messagingSenderId: "1014004830031",
-    appId: "1:1014004830031:web:fe2431f59a114ff400bf3a",
-    measurementId: "G-1TY8BJV4RG",
-  };
+  apiKey: "AIzaSyBDXEsSf8Cs0P1_qU-uwjBeH90PxcJbqN8",
+  authDomain: "livichat-f2654.firebaseapp.com",
+  projectId: "livichat-f2654",
+  storageBucket: "livichat-f2654.firebasestorage.app",
+  messagingSenderId: "203874040682",
+  appId: "1:203874040682:web:92fefa679d8eb586ea0313",
+  measurementId: "G-04X1X3R6NG"
+};
 
 firebase.initializeApp(firebaseConfig);
 

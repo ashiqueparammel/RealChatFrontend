@@ -11,7 +11,7 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import Validforms from "../../Helpers/Validforms";
 import LogoSpinner from "../../Helpers/LogoSpinner";
-import { getFCMToken, sendTokenToBackend } from "../../firebase";
+// import { getFCMToken, sendTokenToBackend } from "../../firebase";
 
 function Login() {
   const location = useLocation();
